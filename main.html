@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CHAMA MINI BOT</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+  />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #007bff, #ff00a6);
+      font-family: 'Poppins', sans-serif;
+      color: #1a003a;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Loading Screen Overlay */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 1.9s ease;
+    }
+
+    /* Loader Animation (Big Spinner) */
+    .big-loader {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin-bottom: 20px;
+    }
+    .big-loader::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 6px solid transparent;
+      border-radius: 50%;
+      border-top-color: #48ff00;
+      animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite,
+        glow 1.5s ease-in-out infinite;
+      box-shadow: 0 0 15px rgba(50, 205, 50, 0.5);
+    }
+    .big-loader::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: calc(100% - 16px);
+      height: calc(100% - 16px);
+      border: 4px solid transparent;
+      border-radius: 50%;
+      border-top-color: #48ff00;
+      animation: spinReverse 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite,
+        innerGlow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    @keyframes spinReverse {
+      to {
+        transform: rotate(-360deg);
+      }
+    }
+    @keyframes glow {
+      0%,
+      100% {
+        box-shadow: 0 0 15px #a8e4a0, 0 0 30px rgba(50, 205, 50, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 25px #1a003a, 0 0 45px rgba(50, 205, 50, 0.7);
+      }
+    }
+    @keyframes innerGlow {
+      0%,
+      100% {
+        box-shadow: 0 0 5px #00eaff, 0 0 10px rgba(168, 228, 160, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 15px #007bff, 0 0 25px rgba(168, 228, 160, 0.7);
+      }
+    }
+
+    /* Rest of your styles */
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      z-index: 10;
+      position: relative;
+    }
+
+    .box {
+      width: 100%;
+      max-width: 350px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      transform: perspective(1000px) rotateY(0deg);
+      transition: transform 0.3s ease;
+    }
+
+    .box:hover {
+      transform: perspective(1000px) rotateY(5deg);
+    }
+
+    #text {
+      color: #ffec00;
+    }
+
+    .centered-text {
+      color: #1a003a;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    h4 {
+      color: #ff2d55;
+      margin-bottom: 15px;
+    }
+
+    h6 {
+      color: #c7d6ff;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .input-container {
+      display: flex;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 5px;
+      gap: 5px;
+      width: 100%;
+      max-width: 320px;
+      transition: all 0.3s ease;
+    }
+
+    .input-container input {
+      flex: 1;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 8px 0 0 8px;
+      color: #5e5e5e;
+      font-size: 1rem;
+      border-left: 3px solid #ff6b6b;
+      transition: all 0.3s ease;
+    }
+
+    .input-container input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .input-container input:focus {
+      border-left: 3px solid #00eaff;
+      background: rgba(255, 255, 255, 0.3);
+      outline: none;
+    }
+
+    .input-container button {
+      padding: 12px;
+      background: linear-gradient(135deg, #8a2be2, #4b0082);
+      border: none;
+      border-radius: 0 8px 8px 0;
+      color: #8a2be2;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .input-container button:hover {
+      background: linear-gradient(135deg, #007bff, #0e9);
+      color: #ffec00;
+      transform: translateY(-2px);
+    }
+
+    #waiting-message,
+    #pair a {
+      color: #1a003a;
+      font-size: 1rem;
+      margin-top: 20px;
+      display: block;
+    }
+
+    #copy {
+      cursor: pointer;
+      color: #ff6b6b;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    #copy:hover {
+      color: #ff6b6b;
+    }
+
+    @media (max-width: 500px) {
+      .box {
+        padding: 20px;
+      }
+
+      .input-container {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .input-container input {
+        border-radius: 8px;
+        border-left: none;
+        border-bottom: 3px solid #00eaff;
+      }
+
+      .input-container button {
+        border-radius: 8px;
+      }
+
+      .centered-text {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="big-loader"></div>
+    <div class="centered-text" style="color:#32CD32;letter-spacing:2px;">LOADING...</div>
+  </div>
+
+  <div class="container">
+    <div class="main">
+      <div class="box" id="box">
+        <div id="text">
+          <i class="fa fa-user" style="font-size: 2rem; color: #ff6b6b;"></i>
+          <h3 class="centered-text">LINK WITH PHONE NUMBER</h3>
+          <h4>SANCHO-XMD MINI BOT</h4>
+          <h6>POWERED BY SANCHO TECH</h6>
+          <div class="input-container">
+            <input placeholder="+263780325xxx" type="number" id="number" name="" />
+            <button id="submit">SUBMIT</button>
+          </div>
+          <a id="waiting-message" class="centered-text" style="display: none;">
+            <span>Please wait</span>
+            <span class="loading-dots">
+              <span>.</span><span>.</span><span>.</span>
+            </span>
+          </a>
+          <main id="pair"></main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+  <script>
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+    let waitingMessage = document.getElementById("waiting-message");
+    let loadingScreen = document.getElementById("loading-screen");
+    let box = document.getElementById("box");
+
+    // Hide loading screen on page load (simulate page ready)
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        loadingScreen.style.opacity = "0";
+        setTimeout(() => {
+          loadingScreen.style.display = "none";
+        }, 500);
+      }, 1500); // simulate 1.5s loading on page load
+    });
+
+    async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace("CODE: ", ""));
+      obj.innerText = "COPIED";
+      obj.style = "color:#32CD32;font-weight:bold";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style = "color:#ff6b6b;font-weight:bold";
+      }, 500);
+    }
+
+    b.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!c.value) {
+        a.innerHTML =
+          '<a style="color:#1a003a;font-weight:bold">❗ Enter your WhatsApp number with country code.</a><br><br>';
+        waitingMessage.style.display = "none";
+      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML =
+          '<a style="color:#00ffff;font-weight:bold">❌ Invalid number format ❌</a><br><br>';
+        waitingMessage.style.display = "none";
+      } else {
+        const bc = c.value.replace(/[^0-9]/g, "");
+        let bb = "";
+        let bbc = "";
+        const cc = bc.split("");
+        cc.forEach((a, index) => {
+          bbc += a;
+          if (bbc.length === 3 || bbc.length === 8) {
+            bb += " " + a;
+          } else {
+            bb += a;
+          }
+        });
+        c.type = "text";
+        c.value = "+" + bb;
+        c.style = "color:#c7d6ff;font-size:18px";
+        a.innerHTML = "";
+        waitingMessage.style.display = "inline-block";
+
+        try {
+          let { data } = await axios(`/code?number=${bc}`);
+          let code = data.code || "Service Unavailable";
+          waitingMessage.style.display = "none";
+          a.innerHTML =
+            '<font id="copy" onclick="Copy()" style="color:#ff6b6b;font-weight:bold" size="5">CODE: <span style="color:#ff2d55;font-weight:bold">' +
+            code +
+            "</span></font><br><br><br>";
+        } catch (error) {
+          waitingMessage.style.display = "none";
+          a.innerHTML =
+            '<a style="color:#1a003a;font-weight:bold">❌ Error fetching code ❌</a><br><br>';
+        }
+      }
+    });
+  </script>
+  <style>
+    /* Loading dots animation */
+    @keyframes loadingDots {
+      0% {
+        opacity: 0.2;
+        transform: translateY(0);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(-5px);
+      }
+      40% {
+        opacity: 0.2;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0.2;
+        transform: translateY(0);
+      }
+    }
+
+    .loading-dots span {
+      display: inline-block;
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: #1a003a;
+      animation-name: loadingDots;
+      animation-duration: 1.4s;
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+      margin-right: 5px;
+      opacity: 0.2;
+    }
+
+    .loading-dots span:nth-child(1) {
+      animation-delay: 0s;
+    }
+    .loading-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .loading-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  </style>
+</body>
+</html>

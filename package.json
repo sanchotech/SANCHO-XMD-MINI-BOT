@@ -1,0 +1,39 @@
+{
+  "name": "SANCHO-XMD MINI-BOT",
+  "version": "1.0.0",
+  "description": "WhatsApp Bot with Multi-Number Support",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "npm:baileys-mod",
+    "@dark-yasiya/scrap": "1.0.1",
+    "@xaviabot/fb-downloader": "1.0.14",
+    "darksadas-yt-pornhub-scrape": "^1.0.0",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "node-fetch": "^2.6.7",
+    "dotenv": "^16.4.5",
+    "pino": "^8.17.0",
+    "jimp": "^0.16.1",
+    "@octokit/rest": "^20.0.2",
+    "denethdev-ytmp3": "1.0.3",
+    "axios": "^1.2.5",
+    "yt-search": "2.12.1",
+    "moment-timezone": "^0.6.0"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "multi-device",
+    "baileys",
+    "shala-md"
+  ],
+  "author": "SANCHO-TECH",
+  "license": "MIT"
+}
